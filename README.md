@@ -184,3 +184,4 @@ Map a word to an index for use with lookup_ngram().
 
 Look up the log-probability of ngram.
 
+End.
