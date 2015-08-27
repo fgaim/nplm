@@ -50,6 +50,9 @@ struct param
 
     double L2_reg;
 
+    double input_dropout;
+    int null_index;
+
     bool normalization;
     double normalization_init;
 

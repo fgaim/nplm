@@ -128,6 +128,9 @@ int main(int argc, char** argv)
 
       ValueArg<double> L2_reg("", "L2_reg", "L2 regularization strength (hidden layer weights only). Default: 0.", false, 0.0, "double", cmd);
 
+      ValueArg<double> input_dropout("", "input_dropout", "Probability of retaining input word. Values between 0 (all input is ignored) to 1 (no dropout). Default: 1.", false, 1, "double", cmd);
+      ValueArg<int> null_index("", "null_index", "Index of null word. Used as special (dropped out) token for input dropout.", false, 0, "int", cmd);
+
       ValueArg<double> learning_rate("", "learning_rate", "Learning rate for stochastic gradient ascent. Default: 1.", false, 1., "double", cmd);
 
       ValueArg<double> conditioning_constant("", "conditioning_constant", "Constant to condition the RMS of the expected square of the gradient in ADADELTA. Default: 10E-3.", false, 10E-3, "double", cmd);
@@ -219,6 +222,8 @@ int main(int argc, char** argv)
       myParam.initial_momentum = initial_momentum.getValue();
       myParam.final_momentum = final_momentum.getValue();
       myParam.L2_reg = L2_reg.getValue();
+      myParam.input_dropout = input_dropout.getValue();
+      myParam.null_index = null_index.getValue();
       myParam.init_normal= init_normal.getValue();
       myParam.init_range = init_range.getValue();
       myParam.normalization_init = normalization_init.getValue();
@@ -294,6 +299,13 @@ int main(int argc, char** argv)
       {
         cerr << initial_momentum.getDescription() << sep << initial_momentum.getValue() << endl;
         cerr << final_momentum.getDescription() << sep << final_momentum.getValue() << endl;
+      }
+
+      if (myParam.input_dropout < 1) {
+          if (myParam.null_index == 0) {
+              cerr << "error: index of null word (--null_index) undefined, but required for input dropout." << endl;
+              exit(1);
+          }
       }
 
       cerr << num_threads.getDescription() << sep << num_threads.getValue() << endl;
@@ -644,6 +656,13 @@ int main(int argc, char** argv)
 
             ///// Forward propagation
 
+            if (myParam.null_index > 0) {
+                nn.input_layer.zero(myParam.null_index);
+                if (myParam.input_dropout < 1) {
+                    minibatch.topRows(ngram_size-1) = minibatch.topRows(ngram_size-1).array().unaryExpr(bernoulli_replace(rng, myParam.input_dropout, myParam.null_index));
+                }
+            }
+
             prop.fProp(minibatch.topRows(ngram_size-1));
 
       if (loss_function == NCELoss)
@@ -776,6 +795,10 @@ int main(int argc, char** argv)
 
   if (myParam.model_prefix != "")
   {
+      if (myParam.null_index > 0) {
+          nn.input_layer.zero(myParam.null_index);
+      }
+
       cerr << "Writing model" << endl;
       if (myParam.input_words_file != "")
           nn.write(myParam.model_prefix + "." + lexical_cast<string>(epoch+1), input_words, output_words);

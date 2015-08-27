@@ -751,6 +751,11 @@ class Input_word_embeddings
     W->setZero(rows, cols);
   }
 
+  void zero(int output_id)
+  {
+    W->row(output_id).setZero();
+  }
+
   void read(std::ifstream &W_file) { readMatrix(W_file, *W); }
   void write(std::ofstream &W_file) { writeMatrix(*W, W_file); }
 

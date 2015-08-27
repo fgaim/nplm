@@ -9,6 +9,7 @@
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/random/normal_distribution.hpp>
+#include <boost/random/bernoulli_distribution.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/functional/hash.hpp>
 #ifdef USE_CHRONO
@@ -273,6 +274,25 @@ extern Timer timer;
 #define start_timer(x) (void)0
 #define stop_timer(x) (void)0
 #endif
+
+// replace input word with default value (<null>) with probability of 1-input_dropout
+struct bernoulli_replace {
+  mutable boost::random::mt19937 engine;
+  boost::random::bernoulli_distribution<double> bernoulli_dist;
+  int default_value;
+
+  bernoulli_replace(boost::random::mt19937 &rng, double input_dropout, int null_index) :
+    engine(rng),
+    bernoulli_dist(input_dropout),
+    default_value(null_index) {}
+
+  int operator() (int x) const {
+      if (bernoulli_dist(engine))
+          return x;
+      else
+          return default_value;
+  }
+};
 
 int setup_threads(int n_threads);
 
