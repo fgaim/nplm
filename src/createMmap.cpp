@@ -70,22 +70,26 @@ void writeMmap(const string &filename_input,
   ifstream training(filename_input.c_str());
   data_size_t i = 0;
   std::string line;
-  std::vector<std::string> ngram;
+  std::string delimiters = " \t";
   while (std::getline(training, line)) {
 
     if ((i%10000000)==0) {
         std::cerr<<i<<"...";
     }
 
-    splitBySpace(line, ngram);
-    if (ngram.size() != ngram_size)
-    {
-        std::cerr << "Error: expected " << ngram_size << " fields in instance, found " << ngram.size() << std::endl;
-        std::exit(-1);
+    std::string::size_type startPos = line.find_first_not_of(delimiters, 0);
+    std::string::size_type endPos;
+    size_t j = 0;
+    while (std::string::npos != startPos) {
+      endPos = line.find_first_of(delimiters, startPos);
+      mMapVec->at(i*ngram_size+j) = (int)strtol(line.data() + startPos, NULL, 10);
+      j++;
+      startPos = line.find_first_not_of(delimiters, endPos);
     }
-
-    for (int j=0; j<ngram_size; j++) {
-      mMapVec->at(i*ngram_size+j) = boost::lexical_cast<int>(ngram[j]);
+    if (j != ngram_size)
+    {
+        std::cerr << "Error: expected " << ngram_size << " fields in instance, found " << j << std::endl;
+        std::exit(-1);
     }
 
     ++i;
