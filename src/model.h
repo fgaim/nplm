@@ -20,7 +20,7 @@ public:
     Linear_layer second_hidden_linear;
     Activation_function second_hidden_activation;
     Output_word_embeddings output_layer;
-    Matrix<double,Dynamic,Dynamic,Eigen::RowMajor> output_embedding_matrix,
+    Matrix<user_data_t,Dynamic,Dynamic,Eigen::RowMajor> output_embedding_matrix,
       input_embedding_matrix,
       input_and_output_embedding_matrix;
     
@@ -37,13 +37,13 @@ public:
         bool share_embeddings) 
     {
         if (share_embeddings){
-          input_and_output_embedding_matrix = Matrix<double,Dynamic,Dynamic,Eigen::RowMajor>();
+          input_and_output_embedding_matrix = Matrix<user_data_t,Dynamic,Dynamic,Eigen::RowMajor>();
           input_layer.set_W(&input_and_output_embedding_matrix);
           output_layer.set_W(&input_and_output_embedding_matrix);
         }
         else {
-          input_embedding_matrix = Matrix<double,Dynamic,Dynamic,Eigen::RowMajor>();
-          output_embedding_matrix = Matrix<double,Dynamic,Dynamic,Eigen::RowMajor>();
+          input_embedding_matrix = Matrix<user_data_t,Dynamic,Dynamic,Eigen::RowMajor>();
+          output_embedding_matrix = Matrix<user_data_t,Dynamic,Dynamic,Eigen::RowMajor>();
           input_layer.set_W(&input_embedding_matrix);
           output_layer.set_W(&output_embedding_matrix);
         }
@@ -57,8 +57,8 @@ public:
     model() : ngram_size(1), 
             premultiplied(false),
             activation_function(Rectifier),
-            output_embedding_matrix(Matrix<double,Dynamic,Dynamic,Eigen::RowMajor>()),
-            input_embedding_matrix(Matrix<double,Dynamic,Dynamic,Eigen::RowMajor>())
+            output_embedding_matrix(Matrix<user_data_t,Dynamic,Dynamic,Eigen::RowMajor>()),
+            input_embedding_matrix(Matrix<user_data_t,Dynamic,Dynamic,Eigen::RowMajor>())
         {
           output_layer.set_W(&output_embedding_matrix);
           input_layer.set_W(&input_embedding_matrix);
@@ -73,10 +73,10 @@ public:
 
     void initialize(boost::random::mt19937 &init_engine,
         bool init_normal,
-        double init_range,
-        double init_bias,
+        user_data_t init_range,
+        user_data_t init_bias,
         string &parameter_udpate,
-        double adagrad_epsilon);
+        user_data_t adagrad_epsilon);
 
     void set_activation_function(activation_function_type f)
     {

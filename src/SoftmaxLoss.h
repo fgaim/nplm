@@ -40,16 +40,16 @@ inline std::string loss_function_to_string (loss_function_type f)
 struct SoftmaxLogLoss
 {
   template <typename DerivedI, typename DerivedW, typename DerivedO>
-  void fProp(const MatrixBase<DerivedI> &input, const MatrixBase<DerivedW> &output_words, const MatrixBase<DerivedO> &output_const, double &loss)
+  void fProp(const MatrixBase<DerivedI> &input, const MatrixBase<DerivedW> &output_words, const MatrixBase<DerivedO> &output_const, user_data_t &loss)
   {
     UNCONST(DerivedO, output_const, output);
 
-    double log_likelihood = 0.0;
+    user_data_t log_likelihood = 0.0;
 
 #pragma omp parallel for reduction(+:log_likelihood)
     for (int train_id = 0; train_id < input.cols(); train_id++)
     {
-      double normalization = logsum(input.col(train_id));
+      user_data_t normalization = logsum(input.col(train_id));
       output.col(train_id).array() = input.col(train_id).array() - normalization;
       log_likelihood += output(output_words(train_id), train_id);
     }
@@ -91,12 +91,12 @@ class SoftmaxNCELoss
   template <typename DerivedI, typename DerivedW, typename DerivedO>
   void fProp(const MatrixBase<DerivedI> &scores,
              const MatrixBase<DerivedW> &minibatch_samples,
-             const MatrixBase<DerivedO> &output_const, double &loss)
+             const MatrixBase<DerivedO> &output_const, user_data_t &loss)
   {
     UNCONST(DerivedO, output_const, output);
-    double log_likelihood = 0.0;
+    user_data_t log_likelihood = 0.0;
     int num_noise_samples = minibatch_samples.rows()-1;
-    double log_num_noise_samples = std::log(num_noise_samples);
+    user_data_t log_num_noise_samples = std::log(num_noise_samples);
 #pragma omp parallel for reduction(+:log_likelihood) schedule(static)
     for (int train_id = 0; train_id < scores.cols(); train_id++)
     {
@@ -106,11 +106,11 @@ class SoftmaxNCELoss
         // To avoid zero or infinite probabilities,
         // never take exp of score without normalizing first,
         // even if it's a little slower...
-        double score = scores(sample_id, train_id);
-        double score_noise = log_num_noise_samples + unigram.logprob(sample);
-        double z = logadd(score, score_noise);
-        double logprob = score - z;
-        double logprob_noise = score_noise - z;
+        user_data_t score = scores(sample_id, train_id);
+        user_data_t score_noise = log_num_noise_samples + unigram.logprob(sample);
+        user_data_t z = logadd(score, score_noise);
+        user_data_t logprob = score - z;
+        user_data_t logprob_noise = score_noise - z;
         output(sample_id, train_id) = std::exp(logprob);
         log_likelihood += sample_id == 0 ? logprob : logprob_noise;
       }

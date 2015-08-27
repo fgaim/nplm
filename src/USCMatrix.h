@@ -70,7 +70,7 @@ class USCMatrix
 // Dense matrix - sparse matrix product
 // a is presumably very wide
 template <typename DerivedA, typename ScalarB, typename Index, typename DerivedC>
-void uscgemm(double alpha, const MatrixBase<DerivedA> &a,
+void uscgemm(user_data_t alpha, const MatrixBase<DerivedA> &a,
              const USCMatrix<ScalarB,Index> &b,
              const MatrixBase<DerivedC> &c_const)
 {
@@ -92,7 +92,7 @@ void uscgemm(double alpha, const MatrixBase<DerivedA> &a,
 
 // sparse matrix - dense matrix product
 template <typename ScalarA, typename Index, typename DerivedB, typename DerivedC>
-void uscgemm(double alpha,
+void uscgemm(user_data_t alpha,
              const USCMatrix<ScalarA,Index> &a,
              const MatrixBase<DerivedB> &b,
              const MatrixBase<DerivedC> &c_const)
@@ -145,7 +145,7 @@ void uscgemm(double alpha,
 // For b, column-major is preferred.
 
 template <typename DerivedA, typename DerivedB, typename ScalarC, typename Index>
-void uscgemm_masked(double alpha,
+void uscgemm_masked(user_data_t alpha,
                     const MatrixBase<DerivedA> &a,
                     const MatrixBase<DerivedB> &b,
                     USCMatrix<ScalarC,Index> &c)
@@ -167,7 +167,7 @@ void uscgemm_masked(double alpha,
 
 // sparse matrix - dense vector product
 template <typename ScalarA, typename Index, typename DerivedB, typename DerivedC>
-void uscgemv(double alpha,
+void uscgemv(user_data_t alpha,
              const USCMatrix<ScalarA,Index> &a,
              const MatrixBase<DerivedB> &b,
              const MatrixBase<DerivedC> &c_const)

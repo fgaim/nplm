@@ -46,10 +46,10 @@ void model::resize(int ngram_size,
 
 void model::initialize(boost::random::mt19937 &init_engine,
                        bool init_normal,
-                       double init_range,
-                       double init_bias,
+                       user_data_t init_range,
+                       user_data_t init_bias,
                        string &parameter_update,
-                       double adagrad_epsilon)
+                       user_data_t adagrad_epsilon)
 {
   input_layer.initialize(init_engine,
                          init_normal,
@@ -79,7 +79,7 @@ void model::premultiply()
   // Since input and first_hidden_linear are both linear,
   // we can multiply them into a single linear layer *if* we are not training
   int context_size = ngram_size-1;
-  Matrix<double,Dynamic,Dynamic> U = first_hidden_linear.U;
+  Matrix<user_data_t,Dynamic,Dynamic> U = first_hidden_linear.U;
   if (num_hidden == 0)
   {
     first_hidden_linear.U.resize(output_embedding_dimension, input_vocab_size * context_size);

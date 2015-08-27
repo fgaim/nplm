@@ -98,10 +98,10 @@ int main (int argc, char *argv[])
     int num_batches = (test_data_size-1)/myParam.minibatch_size + 1;
     cerr<<"Number of test minibatches: "<<num_batches<<endl;
 
-    double log_likelihood = 0.0;
+    user_data_t log_likelihood = 0.0;
     
-    Matrix<double,Dynamic,Dynamic> scores(nn.output_vocab_size, myParam.minibatch_size);
-    Matrix<double,Dynamic,Dynamic> output_probs(nn.output_vocab_size, myParam.minibatch_size);
+    Matrix<user_data_t,Dynamic,Dynamic> scores(nn.output_vocab_size, myParam.minibatch_size);
+    Matrix<user_data_t,Dynamic,Dynamic> output_probs(nn.output_vocab_size, myParam.minibatch_size);
 
     for (int batch = 0; batch < num_batches; batch++)
     {
@@ -122,7 +122,7 @@ int main (int argc, char *argv[])
 
 
 	    // And softmax and loss
-	    double minibatch_log_likelihood;
+	    user_data_t minibatch_log_likelihood;
 	    SoftmaxLogLoss().fProp(scores.leftCols(current_minibatch_size), 
 				  minibatch.row(myParam.ngram_size-1), 
 				  output_probs,

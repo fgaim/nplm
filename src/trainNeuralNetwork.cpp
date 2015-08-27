@@ -40,7 +40,7 @@ using namespace boost::random;
 using namespace nplm;
 
 namespace ip = boost::interprocess;
-typedef unordered_map<Matrix<int,Dynamic,1>, double> vector_map;
+typedef unordered_map<Matrix<int,Dynamic,1>, user_data_t> vector_map;
 
 typedef ip::allocator<int, ip::managed_mapped_file::segment_manager> intAllocator;
 typedef ip::vector<int, intAllocator> vec;
@@ -50,12 +50,12 @@ typedef ip::allocator<vec, ip::managed_mapped_file::segment_manager> vecAllocato
 typedef long long int data_size_t; // training data can easily exceed 2G instances
 
 
-void compute_validation_perplexity(int ngram_size, int output_vocab_size, int validation_minibatch_size, int validation_data_size, int num_validation_batches, param & myParam, propagator & prop_validation, Map< Matrix<int,Dynamic,Dynamic> > & validation_data, double & current_learning_rate, double & current_validation_ll)
+void compute_validation_perplexity(int ngram_size, int output_vocab_size, int validation_minibatch_size, int validation_data_size, int num_validation_batches, param & myParam, propagator & prop_validation, Map< Matrix<int,Dynamic,Dynamic> > & validation_data, user_data_t & current_learning_rate, user_data_t & current_validation_ll)
 {
-    double log_likelihood = 0.0;
+    user_data_t log_likelihood = 0.0;
 
-    Matrix<double,Dynamic,Dynamic> scores(output_vocab_size, validation_minibatch_size);
-    Matrix<double,Dynamic,Dynamic> output_probs(output_vocab_size, validation_minibatch_size);
+    Matrix<user_data_t,Dynamic,Dynamic> scores(output_vocab_size, validation_minibatch_size);
+    Matrix<user_data_t,Dynamic,Dynamic> output_probs(output_vocab_size, validation_minibatch_size);
     Matrix<int,Dynamic,Dynamic> minibatch(ngram_size, validation_minibatch_size);
 
     for (int validation_batch =0;validation_batch < num_validation_batches;validation_batch++)
@@ -76,7 +76,7 @@ void compute_validation_perplexity(int ngram_size, int output_vocab_size, int va
         stop_timer(4);
 
         // And softmax and loss. Be careful of short minibatch
-        double minibatch_log_likelihood;
+        user_data_t minibatch_log_likelihood;
         start_timer(5);
         SoftmaxLogLoss().fProp(scores.leftCols(current_minibatch_size),
                                 minibatch.row(ngram_size-1),
@@ -113,11 +113,11 @@ int main(int argc, char** argv)
 
       ValueArg<int> num_threads("", "num_threads", "Number of threads. Default: maximum.", false, 0, "int", cmd);
 
-      ValueArg<double> final_momentum("", "final_momentum", "Final value of momentum. Default: 0.9.", false, 0.9, "double", cmd);
-      ValueArg<double> initial_momentum("", "initial_momentum", "Initial value of momentum. Default: 0.9.", false, 0.9, "double", cmd);
+      ValueArg<user_data_t> final_momentum("", "final_momentum", "Final value of momentum. Default: 0.9.", false, 0.9, "user_data_t", cmd);
+      ValueArg<user_data_t> initial_momentum("", "initial_momentum", "Initial value of momentum. Default: 0.9.", false, 0.9, "user_data_t", cmd);
       ValueArg<bool> use_momentum("", "use_momentum", "Use momentum (hidden layer weights only). 1 = yes, 0 = no. Default: 0.", false, 0, "bool", cmd);
 
-      ValueArg<double> normalization_init("", "normalization_init", "Initial normalization parameter. Default: 0.", false, 0.0, "double", cmd);
+      ValueArg<user_data_t> normalization_init("", "normalization_init", "Initial normalization parameter. Default: 0.", false, 0.0, "user_data_t", cmd);
       ValueArg<bool> normalization("", "normalization", "Learn individual normalization factors during training. 1 = yes, 0 = no. Default: 0.", false, 0, "bool", cmd);
 
       ValueArg<bool> mmap_file("", "mmap_file", "Use memory mapped files. This is useful if the entire data cannot fit in memory. prepareNeuralLM can generate memory mapped files", false, 0, "bool", cmd);
@@ -126,24 +126,24 @@ int main(int argc, char** argv)
 
       ValueArg<int> num_noise_samples("", "num_noise_samples", "Number of noise samples for noise-contrastive estimation. Default: 100.", false, 100, "int", cmd);
 
-      ValueArg<double> L2_reg("", "L2_reg", "L2 regularization strength (hidden layer weights only). Default: 0.", false, 0.0, "double", cmd);
+      ValueArg<user_data_t> L2_reg("", "L2_reg", "L2 regularization strength (hidden layer weights only). Default: 0.", false, 0.0, "user_data_t", cmd);
 
-      ValueArg<double> input_dropout("", "input_dropout", "Probability of retaining input word. Values between 0 (all input is ignored) to 1 (no dropout). Default: 1.", false, 1, "double", cmd);
+      ValueArg<double> input_dropout("", "input_dropout", "Probability of retaining input word. Values between 0 (all input is ignored) to 1 (no dropout). Default: 1.", false, 1, "user_data_t", cmd);
       ValueArg<int> null_index("", "null_index", "Index of null word. Used as special (dropped out) token for input dropout.", false, 0, "int", cmd);
 
-      ValueArg<double> learning_rate("", "learning_rate", "Learning rate for stochastic gradient ascent. Default: 1.", false, 1., "double", cmd);
+      ValueArg<user_data_t> learning_rate("", "learning_rate", "Learning rate for stochastic gradient ascent. Default: 1.", false, 1., "user_data_t", cmd);
 
-      ValueArg<double> conditioning_constant("", "conditioning_constant", "Constant to condition the RMS of the expected square of the gradient in ADADELTA. Default: 10E-3.", false, 10E-3, "double", cmd);
+      ValueArg<user_data_t> conditioning_constant("", "conditioning_constant", "Constant to condition the RMS of the expected square of the gradient in ADADELTA. Default: 10E-3.", false, 10E-3, "user_data_t", cmd);
 
-      ValueArg<double> decay("", "decay", "Decay for ADADELTA. Default: 0.95", false, 0.95, "double", cmd);
-      ValueArg<double> adagrad_epsilon("", "adagrad_epsilon", "Constant to initialize the L2 squared norm of the gradients with.\
-          Default: 10E-3", false, 10E-3, "double", cmd);
+      ValueArg<user_data_t> decay("", "decay", "Decay for ADADELTA. Default: 0.95", false, 0.95, "user_data_t", cmd);
+      ValueArg<user_data_t> adagrad_epsilon("", "adagrad_epsilon", "Constant to initialize the L2 squared norm of the gradients with.\
+          Default: 10E-3", false, 10E-3, "user_data_t", cmd);
       ValueArg<int> validation_minibatch_size("", "validation_minibatch_size", "Minibatch size for validation. Default: 64.", false, 64, "int", cmd);
       ValueArg<int> minibatch_size("", "minibatch_size", "Minibatch size (for training). Default: 1000.", false, 1000, "int", cmd);
 
       ValueArg<int> num_epochs("", "num_epochs", "Number of epochs. Default: 10.", false, 10, "int", cmd);
 
-      ValueArg<double> init_range("", "init_range", "Maximum (of uniform) or standard deviation (of normal) for initialization. Default: 0.01", false, 0.01, "double", cmd);
+      ValueArg<user_data_t> init_range("", "init_range", "Maximum (of uniform) or standard deviation (of normal) for initialization. Default: 0.01", false, 0.01, "user_data_t", cmd);
       ValueArg<bool> init_normal("", "init_normal", "Initialize parameters from a normal distribution. 1 = normal, 0 = uniform. Default: 0.", false, 0, "bool", cmd);
 
       ValueArg<string> loss_function("", "loss_function", "Loss function (log, nce). Default: nce.", false, "nce", "string", cmd);
@@ -553,10 +553,10 @@ int main(int argc, char** argv)
   cerr<<"Number of validation minibatches: "<<num_validation_batches<<endl;
     }
 
-    double current_momentum = myParam.initial_momentum;
-    double momentum_delta = (myParam.final_momentum - myParam.initial_momentum)/(myParam.num_epochs-1);
-    double current_learning_rate = myParam.learning_rate;
-    double current_validation_ll = 0.0;
+    user_data_t current_momentum = myParam.initial_momentum;
+    user_data_t momentum_delta = (myParam.final_momentum - myParam.initial_momentum)/(myParam.num_epochs-1);
+    user_data_t current_learning_rate = myParam.learning_rate;
+    user_data_t current_validation_ll = 0.0;
 
     int ngram_size = myParam.ngram_size;
     int input_vocab_size = myParam.input_vocab_size;
@@ -589,7 +589,7 @@ int main(int argc, char** argv)
 
   cerr << "Training minibatches: ";
 
-  double log_likelihood = 0.0;
+  user_data_t log_likelihood = 0.0;
 
   int num_samples = 0;
   if (loss_function == LogLoss)
@@ -597,10 +597,10 @@ int main(int argc, char** argv)
   else if (loss_function == NCELoss)
       num_samples = 1+num_noise_samples;
 
-  Matrix<double,Dynamic,Dynamic> minibatch_weights(num_samples, minibatch_size);
+  Matrix<user_data_t,Dynamic,Dynamic> minibatch_weights(num_samples, minibatch_size);
   Matrix<int,Dynamic,Dynamic> minibatch_samples(num_samples, minibatch_size);
-  Matrix<double,Dynamic,Dynamic> scores(num_samples, minibatch_size);
-  Matrix<double,Dynamic,Dynamic> probs(num_samples, minibatch_size);
+  Matrix<user_data_t,Dynamic,Dynamic> scores(num_samples, minibatch_size);
+  Matrix<user_data_t,Dynamic,Dynamic> probs(num_samples, minibatch_size);
 
         for(data_size_t batch=0;batch<num_batches;batch++)
         {
@@ -640,7 +640,7 @@ int main(int argc, char** argv)
               minibatch = training_data.middleCols(minibatch_start_index, current_minibatch_size);
             }
       #endif
-            double adjusted_learning_rate = current_learning_rate/minibatch_size;
+            user_data_t adjusted_learning_rate = current_learning_rate/minibatch_size;
             //cerr<<"Adjusted learning rate: "<<adjusted_learning_rate<<endl;
 
             /*
@@ -701,7 +701,7 @@ int main(int argc, char** argv)
             }
         }
 
-        double minibatch_log_likelihood;
+        user_data_t minibatch_log_likelihood;
         start_timer(5);
         softmax_loss.fProp(scores.leftCols(current_minibatch_size),
                minibatch_samples,
@@ -747,7 +747,7 @@ int main(int argc, char** argv)
             prop.output_layer_node.param->fProp(prop.second_hidden_activation_node.fProp_matrix, scores);
         stop_timer(4);
 
-        double minibatch_log_likelihood;
+        user_data_t minibatch_log_likelihood;
         start_timer(5);
         SoftmaxLogLoss().fProp(scores.leftCols(current_minibatch_size),
                    minibatch.row(ngram_size-1),

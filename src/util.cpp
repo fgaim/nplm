@@ -147,7 +147,7 @@ void readDataFile(const string &filename, int &ngram_size, vector<int> &data, in
   DATAIN.close();
 }
 
-double logadd(double x, double y)
+user_data_t logadd(user_data_t x, user_data_t y)
 {
     if (x > y)
         return x + log1p(std::exp(y-x));

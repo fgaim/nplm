@@ -20,6 +20,12 @@
 
 #include "maybe_omp.h"
 
+#ifdef NPLM_DOUBLE_PRECISION
+typedef double user_data_t;
+#else
+typedef float user_data_t;
+#endif
+
 // Make matrices hashable
 
 namespace Eigen {
@@ -86,7 +92,7 @@ inline void intgerize(std::vector<std::string> &ngram,std::vector<int> &int_ngra
 template <typename Derived>
 void initMatrix(boost::random::mt19937 &engine,
                 const Eigen::MatrixBase<Derived> &p_const,
-                bool init_normal, double range)
+                bool init_normal, user_data_t range)
 {
   UNCONST(Derived, p_const, p);
   if (init_normal == 0)
@@ -105,7 +111,7 @@ void initMatrix(boost::random::mt19937 &engine,
   else
     // initialize with gaussian distribution with mean 0 and stdev range
   {
-    boost::random::normal_distribution<double> unif_normal(0., range);
+    boost::random::normal_distribution<user_data_t> unif_normal(0., range);
     for (int i = 0; i < p.rows(); i++)
     {
       for (int j = 0; j < p.cols(); j++)
@@ -119,7 +125,7 @@ void initMatrix(boost::random::mt19937 &engine,
 template <typename Derived>
 void initBias(boost::random::mt19937 &engine,
               const Eigen::MatrixBase<Derived> &p_const,
-              bool init_normal, double range)
+              bool init_normal, user_data_t range)
 {
   UNCONST(Derived, p_const, p);
   if (init_normal == 0)
@@ -135,7 +141,7 @@ void initBias(boost::random::mt19937 &engine,
   else
     // initialize with gaussian distribution with mean 0 and stdev range
   {
-    boost::random::normal_distribution<double> unif_normal(0., range);
+    boost::random::normal_distribution<user_data_t> unif_normal(0., range);
     for (int i = 0; i < p.size(); i++)
     {
       p(i) = unif_normal(engine);
@@ -234,11 +240,11 @@ void writeMatrix(const Eigen::MatrixBase<Derived> &param, std::ofstream &OUT)
 }
 
 template <typename Derived>
-double logsum(const Eigen::MatrixBase<Derived> &v)
+user_data_t logsum(const Eigen::MatrixBase<Derived> &v)
 {
   int mi;
-  double m = v.maxCoeff(&mi);
-  double logz = 0.0;
+  user_data_t m = v.maxCoeff(&mi);
+  user_data_t logz = 0.0;
   for (int i=0; i<v.rows(); i++)
     if (i != mi)
       logz += std::exp(v(i) - m);
@@ -246,7 +252,7 @@ double logsum(const Eigen::MatrixBase<Derived> &v)
   return logz;
 }
 
-double logadd(double x, double y);
+user_data_t logadd(user_data_t x, user_data_t y);
 
 #ifdef USE_CHRONO
 class Timer

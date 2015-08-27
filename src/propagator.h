@@ -71,7 +71,7 @@ class propagator {
     else
     {
       int n_inputs = first_hidden_linear_node.param->n_inputs();
-      USCMatrix<double> sparse_data;
+      USCMatrix<user_data_t> sparse_data;
       input_layer_node.param->munge(data, sparse_data);
 
       start_timer(1);
@@ -101,12 +101,12 @@ class propagator {
   template <typename DerivedIn, typename DerivedOut>
   void bProp(const MatrixBase<DerivedIn> &data,
              const MatrixBase<DerivedOut> &output,
-             double learning_rate,
-             double momentum,
-             double L2_reg,
+             user_data_t learning_rate,
+             user_data_t momentum,
+             user_data_t L2_reg,
              std::string &parameter_update,
-             double conditioning_constant,
-             double decay)
+             user_data_t conditioning_constant,
+             user_data_t decay)
   {
     // Output embedding layer
 
@@ -153,12 +153,12 @@ class propagator {
   void bProp(const MatrixBase<DerivedIn> &data,
              const MatrixBase<DerivedOutI> &samples,
              const MatrixBase<DerivedOutV> &weights,
-             double learning_rate,
-             double momentum,
-             double L2_reg,
+             user_data_t learning_rate,
+             user_data_t momentum,
+             user_data_t L2_reg,
              std::string &parameter_update,
-             double conditioning_constant,
-             double decay)
+             user_data_t conditioning_constant,
+             user_data_t decay)
   {
 
     // Output embedding layer
@@ -210,10 +210,10 @@ class propagator {
  private:
   template <typename DerivedIn>
   void bPropRest(const MatrixBase<DerivedIn> &data,
-                 double learning_rate, double momentum, double L2_reg,
+                 user_data_t learning_rate, user_data_t momentum, user_data_t L2_reg,
                  std::string &parameter_update,
-                 double conditioning_constant,
-                 double decay)
+                 user_data_t conditioning_constant,
+                 user_data_t decay)
   {
     // Second hidden layer
 

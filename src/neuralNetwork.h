@@ -20,13 +20,13 @@ class neuralNetwork
 
  private:
   bool normalization;
-  double weight;
+  user_data_t weight;
 
   propagator prop;
 
   std::size_t cache_size;
   Eigen::Matrix<int,Dynamic,Dynamic> cache_keys;
-  std::vector<double> cache_values;
+  std::vector<user_data_t> cache_values;
   int cache_lookups, cache_hits;
 
  public:
@@ -40,7 +40,7 @@ class neuralNetwork
   }
 
   void set_normalization(bool value) { normalization = value; }
-  void set_log_base(double value) { weight = 1./std::log(value); }
+  void set_log_base(user_data_t value) { weight = 1./std::log(value); }
 
   // This must be called if the underlying model is resized.
   void resize() {
@@ -58,7 +58,7 @@ class neuralNetwork
   }
 
   template <typename Derived>
-  double lookup_ngram(const Eigen::MatrixBase<Derived> &ngram)
+  user_data_t lookup_ngram(const Eigen::MatrixBase<Derived> &ngram)
   {
     assert (ngram.rows() == m->ngram_size);
     assert (ngram.cols() == 1);
@@ -90,17 +90,17 @@ class neuralNetwork
     prop.fProp(ngram.col(0));
 
     int output = ngram(m->ngram_size-1, 0);
-    double log_prob;
+    user_data_t log_prob;
 
     start_timer(3);
     if (normalization)
     {
-      Eigen::Matrix<double,Eigen::Dynamic,1> scores(m->output_vocab_size);
+      Eigen::Matrix<user_data_t,Eigen::Dynamic,1> scores(m->output_vocab_size);
       if (prop.skip_hidden)
         prop.output_layer_node.param->fProp(prop.first_hidden_activation_node.fProp_matrix, scores);
       else
         prop.output_layer_node.param->fProp(prop.second_hidden_activation_node.fProp_matrix, scores);
-      double logz = logsum(scores.col(0));
+      user_data_t logz = logsum(scores.col(0));
       log_prob = weight * (scores(output, 0) - logz);
     }
     else
@@ -140,15 +140,15 @@ class neuralNetwork
 
     if (normalization)
     {
-      Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> scores(m->output_vocab_size, ngram.cols());
+      Eigen::Matrix<user_data_t,Eigen::Dynamic,Eigen::Dynamic> scores(m->output_vocab_size, ngram.cols());
       if (prop.skip_hidden)
         prop.output_layer_node.param->fProp(prop.first_hidden_activation_node.fProp_matrix, scores);
       else
         prop.output_layer_node.param->fProp(prop.second_hidden_activation_node.fProp_matrix, scores);
 
       // And softmax and loss
-      Matrix<double,Dynamic,Dynamic> output_probs(m->output_vocab_size, ngram.cols());
-      double minibatch_log_likelihood;
+      Matrix<user_data_t,Dynamic,Dynamic> output_probs(m->output_vocab_size, ngram.cols());
+      user_data_t minibatch_log_likelihood;
       SoftmaxLogLoss().fProp(scores.leftCols(ngram.cols()), ngram.row(m->ngram_size-1), output_probs, minibatch_log_likelihood);
       for (int j=0; j<ngram.cols(); j++)
       {

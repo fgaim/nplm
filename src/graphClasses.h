@@ -14,8 +14,8 @@ class Node {
   X * param; //what parameter is this
   //vector <void *> children;
   //vector <void *> parents;
-  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> fProp_matrix;
-  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> bProp_matrix;
+  Eigen::Matrix<user_data_t,Eigen::Dynamic,Eigen::Dynamic> fProp_matrix;
+  Eigen::Matrix<user_data_t,Eigen::Dynamic,Eigen::Dynamic> bProp_matrix;
   int minibatch_size;
 
  public:
@@ -44,11 +44,11 @@ class Node {
   void resize() { resize(minibatch_size); }
 
   /*
-    void Fprop(Matrix<double,Dynamic,Dynamic> & input,int n_cols)
+    void Fprop(Matrix<user_data_t,Dynamic,Dynamic> & input,int n_cols)
     {
     param->fProp(input,fProp_matrix,0,0,n_cols);
     }
-    void Fprop(Matrix<double,1,Dynamic> & input,int n_cols)
+    void Fprop(Matrix<user_data_t,1,Dynamic> & input,int n_cols)
     {
     param->fProp(input,fProp_matrix,0,0,n_cols);
     }

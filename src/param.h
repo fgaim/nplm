@@ -3,6 +3,12 @@
 
 #include <string>
 
+#ifdef NPLM_DOUBLE_PRECISION
+typedef double user_data_t;
+#else
+typedef float user_data_t;
+#endif
+
 namespace nplm
 {
 
@@ -35,26 +41,26 @@ struct param
     int minibatch_size;
     int validation_minibatch_size;
     int num_epochs;
-    double learning_rate;
-    double conditioning_constant;
-    double decay;
-    double adagrad_epsilon;
+    user_data_t learning_rate;
+    user_data_t conditioning_constant;
+    user_data_t decay;
+    user_data_t adagrad_epsilon;
     bool init_normal;
-    double init_range;
+    user_data_t init_range;
 
     int num_noise_samples;
 
     bool use_momentum;
-    double initial_momentum;
-    double final_momentum;
+    user_data_t initial_momentum;
+    user_data_t final_momentum;
 
-    double L2_reg;
+    user_data_t L2_reg;
 
     double input_dropout;
     int null_index;
 
     bool normalization;
-    double normalization_init;
+    user_data_t normalization_init;
 
     int num_threads;
     int debug;

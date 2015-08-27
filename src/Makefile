@@ -8,6 +8,9 @@ CXX=g++
 #CFLAGS=-g
 CFLAGS=-O3 -DEIGEN_NO_DEBUG -DNDEBUG  $(CXXFLAGS)
 
+# switch between single precision and double precision (single precision recommended on GPU for speed)
+CFLAGS+= -DNPLM_DOUBLE_PRECISION=0
+
 # Architecture. Set to x86_64 or i686 to override.
 ARCH:=$(shell uname -m)
 # Operating system. Set to override (the only option that makes any difference is Darwin).

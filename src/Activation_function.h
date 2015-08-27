@@ -43,27 +43,27 @@ inline std::string activation_function_to_string (activation_function_type f)
 }
 
 struct hardtanh_functor {
-  double operator() (double x) const { if (x < -1.) return -1.; else if (x > 1.) return 1.; else return x; }
+  user_data_t operator() (user_data_t x) const { if (x < -1.) return -1.; else if (x > 1.) return 1.; else return x; }
 };
 
 struct dhardtanh_functor {
-  double operator() (double x) const { return x > -1. && x < 1. ? 1. : 0.; }
+  user_data_t operator() (user_data_t x) const { return x > -1. && x < 1. ? 1. : 0.; }
 };
 
 struct tanh_functor {
-  double operator() (double x) const { return std::tanh(x); }
+  user_data_t operator() (user_data_t x) const { return std::tanh(x); }
 };
 
 struct dtanh_functor {
-  double operator() (double x) const { return 1-x*x; }
+  user_data_t operator() (user_data_t x) const { return 1-x*x; }
 };
 
 struct rectifier_functor {
-  double operator() (double x) const { return std::max(x, 0.); }
+  user_data_t operator() (user_data_t x) const { return std::max(x, 0.); }
 };
 
 struct drectifier_functor {
-  double operator() (double x) const { return x > 0. ? 1. : 0.; }
+  user_data_t operator() (user_data_t x) const { return x > 0. ? 1. : 0.; }
 };
 
 class Activation_function
@@ -78,7 +78,7 @@ class Activation_function
   void set_activation_function(activation_function_type f) { this->f = f; }
 
   template <typename Engine>
-  void initialize(Engine &engine, bool init_normal, double init_range) { }
+  void initialize(Engine &engine, bool init_normal, user_data_t init_range) { }
 
   int n_inputs () const { return size; }
   int n_outputs () const { return size; }
