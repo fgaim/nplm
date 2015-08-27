@@ -59,6 +59,8 @@ struct param
     double input_dropout;
     int null_index;
 
+    bool save_best;
+
     bool normalization;
     user_data_t normalization_init;
 
