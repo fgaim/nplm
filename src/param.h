@@ -3,7 +3,7 @@
 
 #include <string>
 
-#ifdef NPLM_DOUBLE_PRECISION
+#if NPLM_DOUBLE_PRECISION == 1
 typedef double user_data_t;
 #else
 typedef float user_data_t;

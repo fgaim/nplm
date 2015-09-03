@@ -59,7 +59,7 @@ struct dtanh_functor {
 };
 
 struct rectifier_functor {
-  user_data_t operator() (user_data_t x) const { return std::max(x, 0.); }
+  user_data_t operator() (user_data_t x) const { return std::max(x, user_data_t(0.)); }
 };
 
 struct drectifier_functor {
