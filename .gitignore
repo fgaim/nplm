@@ -8,5 +8,9 @@ src/prepareNeuralTM
 src/testNeuralLM
 src/testNeuralNetwork
 src/trainNeuralNetwork
+src/createMmap
 .history
 src/make.sh
+bin/
+lib/
+3rdparty/*
