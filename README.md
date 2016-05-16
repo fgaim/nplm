@@ -1,4 +1,4 @@
-2013-07-30
+2016-05-16
 
 Prerequisites
 -------------
@@ -30,7 +30,8 @@ Building
 --------
 
 To compile, edit the Makefile to reflect the locations of the Boost
-and Eigen include directories.
+and Eigen include directories. Or put them in `3rdparty` directory 
+for the default makefile.
 
 If you want to use the Intel MKL library (recommended if you have it),
 uncomment the line
@@ -74,9 +75,11 @@ following:
 A typical invocation would be:
 
     prepareNeuralLM --train_text mydata.txt --ngram_size 3 \
-                    --n_vocab 5000 --words_file words \
+                    --vocab_size 5000 \
+                    --write_words_file words \
                     --train_file train.ngrams \
-                    --validation_size 500 --validation_file validation.ngrams
+                    --validation_size 500 \
+                    --validation_file validation.ngrams
 
 which would generate the files train.ngrams, validation.ngrams, and words.
 
